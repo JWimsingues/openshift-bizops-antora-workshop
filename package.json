@@ -26,6 +26,9 @@
     "url": "git+https://github.com/example/openshift-bizops-workshop.git"
   },
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=16 <21"
+  },
   "babel": {
     "presets": [
       "@babel/preset-env"

@@ -72,11 +72,11 @@ Endpoints:         10.128.x.x:8080,10.129.x.x:8080
 [source,bash,subs="+macros,+attributes"]
 ----
 export ROUTE_HOST=$(oc get route demo-app -n bizops-demo -o jsonpath='{.spec.host}' --context {cluster-context})
-echo "https://${ROUTE_HOST}"
-curl -sI "http://${ROUTE_HOST}" | head -n 5
+echo "https://$\{ROUTE_HOST}"
+curl -sI "http://$\{ROUTE_HOST}" | head -n 5
 ----
 
-NOTE: Some clusters terminate TLS on the router and redirect HTTP to HTTPS. If `curl` follows redirects or fails TLS verification against a workshop CA, use `curl -skI "https://${ROUTE_HOST}"` and prefer trusting the cluster CA in production.
+NOTE: Some clusters terminate TLS on the router and redirect HTTP to HTTPS. If `curl` follows redirects or fails TLS verification against a workshop CA, use `curl -skI` with the HTTPS Route URL and prefer trusting the cluster CA in production.
 
 .Verify: HTTP response is successful (2xx or expected redirect)
 [%collapsible]
@@ -84,7 +84,7 @@ NOTE: Some clusters terminate TLS on the router and redirect HTTP to HTTPS. If `
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-curl -s -o /dev/null -w "%{http_code}\n" "http://${ROUTE_HOST}"
+curl -s -o /dev/null -w "%\{http_code}\n" "http://$\{ROUTE_HOST}"
 ----
 
 [.console-output]
@@ -142,7 +142,7 @@ demo-app   2/2     2            2           10m   httpd        registry.access.r
 ----
 oc get pods -n bizops-demo --context {cluster-context}
 oc get events -n bizops-demo --sort-by='.lastTimestamp' --context {cluster-context} | tail -n 20
-oc get pod -n bizops-demo -l app=demo-app -o jsonpath='{range .items[*]}{.metadata.name}{" ready="}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}' --context {cluster-context}
+oc get pod -n bizops-demo -l app=demo-app -o jsonpath='\{range .items[*]}\{.metadata.name}\{" ready="}\{.status.conditions[?(@.type=="Ready")].status}\{"\n"}\{end}' --context {cluster-context}
 ----
 
 .Verify: Both demo-app pods report Ready=True
