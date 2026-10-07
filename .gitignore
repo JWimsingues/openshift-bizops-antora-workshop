@@ -1,0 +1,19 @@
+.DS_Store
+t/
+myenv.sh
+
+# Terraform (if setup/ exists)
+setup/.terraform/
+setup/.terraform.lock.hcl
+setup/terraform.tfstate
+setup/terraform.tfstate.backup
+setup/terraform.tfvars
+setup/*.tfplan
+
+# Antora / Node.js
+node_modules/
+.cache/
+gh-pages/
+package-lock.json
+yarn.lock
+yarn-error.log

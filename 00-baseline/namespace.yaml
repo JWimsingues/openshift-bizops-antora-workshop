@@ -1,0 +1,9 @@
+# namespace.yaml
+# Purpose: Demo application namespace for the BizOps workshop
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bizops-demo
+  labels:
+    app.kubernetes.io/part-of: bizops-demo
+    app.kubernetes.io/name: bizops-demo

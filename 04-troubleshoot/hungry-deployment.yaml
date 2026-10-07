@@ -1,0 +1,35 @@
+# hungry-deployment.yaml
+# Purpose: Workload with elevated requests to illustrate capacity and utilization analysis
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hungry-app
+  namespace: bizops-demo
+  labels:
+    app: hungry-app
+    app.kubernetes.io/name: hungry-app
+    app.kubernetes.io/part-of: bizops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hungry-app
+  template:
+    metadata:
+      labels:
+        app: hungry-app
+        app.kubernetes.io/name: hungry-app
+        app.kubernetes.io/part-of: bizops-demo
+    spec:
+      containers:
+        - name: stress
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+          command: ["/bin/sh", "-c"]
+          args: ["while true; do dd if=/dev/zero of=/dev/null bs=1M count=100 2>/dev/null; sleep 1; done"]
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi

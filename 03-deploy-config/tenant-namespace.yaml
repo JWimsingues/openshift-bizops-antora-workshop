@@ -1,0 +1,9 @@
+# tenant-namespace.yaml
+# Purpose: Second namespace used for a brief multitenancy / quota demonstration
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bizops-tenant-a
+  labels:
+    app.kubernetes.io/part-of: bizops-demo
+    tenant: team-a

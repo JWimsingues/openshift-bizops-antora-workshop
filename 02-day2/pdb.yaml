@@ -1,0 +1,16 @@
+# pdb.yaml
+# Purpose: PodDisruptionBudget to keep at least one demo-app pod available during voluntary disruptions
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: demo-app
+  namespace: bizops-demo
+  labels:
+    app: demo-app
+    app.kubernetes.io/name: demo-app
+    app.kubernetes.io/part-of: bizops-demo
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: demo-app

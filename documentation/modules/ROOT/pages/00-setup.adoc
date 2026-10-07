@@ -1,0 +1,226 @@
+= Cluster Setup
+include::_attributes.adoc[]
+
+Prepare a single empty OpenShift cluster with cluster-admin access, create your personal `myenv.sh`, authenticate with a stable `oc` context named `{cluster-context}`, clone this repository, and deploy the baseline demo application used in every later session.
+
+== Prerequisites
+
+[#prerequisites]
+* OpenShift Container Platform {ocp-version} (empty cluster is fine)
+* `oc` CLI matching your cluster version
+* `git`, `curl`, and `envsubst` (from gettext)
+* Cluster-admin credentials (username/password or token) provided by your instructor
+* Network access from your workstation to the cluster API and application router
+
+== Cluster Mapping
+
+[cols="2,2,3",options="header"]
+|===
+| Role | Context name | Notes
+
+| Workshop cluster
+| `{cluster-context}`
+| Single cluster for all sessions
+|===
+
+== Option A - Empty Cluster (Primary Path)
+
+Use this path when the cluster has only the OpenShift platform installed and you have cluster-admin credentials.
+
+[#export-variables]
+=== 1. Create `myenv.sh` and export workshop variables
+
+*What:* Create a personal, gitignored file that holds API URL, credentials, and workshop variables.
+
+*Why:* Credentials must not live in the repository; sourcing one file makes every later command use a stable context name.
+
+Create `myenv.sh` in the repository root (do not commit it):
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat > myenv.sh <<'EOF'
+# Console URL (for quick reference - not used by scripts)
+# Console: https://console-openshift-console.apps.<cluster-domain>
+
+# ── Workshop variables ───────────────────────────────────────────────────
+export OCP_API_URL="https://api.<cluster-domain>:6443"
+export GIT_REPO_URL="https://github.com/example/openshift-bizops-workshop.git"
+export DEMO_NAMESPACE="bizops-demo"
+
+# ── Context cleanup (idempotent) ─────────────────────────────────────────
+oc config delete-context cluster 2>/dev/null
+
+# ── Login + rename context ───────────────────────────────────────────────
+# Prefer a token if your environment requires it:
+# oc login "$OCP_API_URL" --token="<token>"
+oc login "$OCP_API_URL" --username <username> --password '<password>'
+oc config rename-context "$(oc config current-context)" cluster
+EOF
+----
+
+Replace `<cluster-domain>`, the `example` GitHub org/user in `GIT_REPO_URL`, and `<username>` / `<password>` (or use `--token`).
+
+[cols="2,2,4",options="header"]
+|===
+| Variable | Used in | Description
+
+| `OCP_API_URL`
+| `myenv.sh` login
+| Kubernetes API endpoint
+
+| `GIT_REPO_URL`
+| Clone step
+| Git clone URL for this workshop
+
+| `DEMO_NAMESPACE`
+| Labs
+| Namespace for the demo application (`bizops-demo`)
+|===
+
+[#login-cluster]
+=== 2. Authenticate and set the `{cluster-context}` context
+
+*What:* Source `myenv.sh` so `oc` logs in and renames the current context to `{cluster-context}`.
+
+*Why:* Every workshop command uses `--context {cluster-context}` for predictable, shareable instructions.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+source myenv.sh
+----
+
+.Verify: Context exists and you can query the API
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc whoami --context {cluster-context}
+oc get nodes --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+system:admin
+NAME                          STATUS   ROLES                  AGE   VERSION
+ip-10-0-1-10.example.com      Ready    control-plane,master   3d    v1.29.x
+ip-10-0-1-11.example.com      Ready    worker                 3d    v1.29.x
+----
+====
+
+NOTE: On managed OpenShift you may authenticate as a user with `cluster-admin` rather than `kubeadmin`. The context rename pattern is the same.
+
+'''
+
+[#clone-repo]
+=== 3. Clone the workshop repository
+
+*What:* Clone the course repository (or `cd` into it if you already have a local copy).
+
+*Why:* YAML manifests and AsciiDoc live side by side; labs apply files from the repo root.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+git clone "$GIT_REPO_URL"
+cd openshift-bizops-workshop
+----
+
+TIP: If you already cloned the repo and created `myenv.sh` inside it, skip the clone and keep working from that directory.
+
+.Verify: Baseline manifests are present
+[%collapsible]
+====
+[.console-input]
+[source,bash]
+----
+ls 00-baseline/
+----
+
+[.console-output]
+[source,bash]
+----
+deployment.yaml
+namespace.yaml
+route.yaml
+service.yaml
+----
+====
+
+'''
+
+[#deploy-baseline]
+=== 4. Deploy the baseline demo application
+
+icon:clock[] ~1 minute (resources accepted quickly; pods ready in ~30-60s)
+
+*What:* Apply the namespace, Deployment, Service, and Route under `00-baseline/`.
+
+*Why:* Later sessions inspect and operate on this same application instead of starting from an empty namespace each time.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 00-baseline/ --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Pods are Ready and the Route has a host
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods,svc,route -n bizops-demo --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                            READY   STATUS    RESTARTS   AGE
+pod/demo-app-6d8f7c9b4d-abc12   1/1     Running   0          45s
+pod/demo-app-6d8f7c9b4d-def34   1/1     Running   0          45s
+
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/demo-app   ClusterIP   172.30.10.20   <none>        8080/TCP   45s
+
+NAME                                 HOST/PORT                                         PATH   SERVICES   PORT   TERMINATION   WILDCARD
+route.route.openshift.io/demo-app   demo-app-bizops-demo.apps.example.com                    demo-app   http                 None
+----
+====
+
+== Option B - Quick Re-login
+
+Use this when the baseline app is already deployed and you only need to restore the `{cluster-context}` context on a new terminal.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+source myenv.sh
+oc get deployment demo-app -n bizops-demo --context {cluster-context}
+----
+
+== What You Have Now
+
+* Authenticated `oc` context named `{cluster-context}`
+* Cloned workshop repository
+* Running demo app in `{demo-namespace}` with Service and Route
+
+Continue with xref:01-architecture-access.adoc[Session 1: Architecture and Access].
+
+'''
+
+[#reset]
+== Reset
+
+Removes the baseline application and namespace. Run this only if you want to tear down setup before re-running Option A. Order: Route and Service first is optional; deleting the namespace removes all namespaced resources.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc delete -f 00-baseline/ --ignore-not-found --context {cluster-context}
+oc delete namespace bizops-demo --ignore-not-found --wait --context {cluster-context}
+----

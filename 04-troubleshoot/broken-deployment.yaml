@@ -1,0 +1,36 @@
+# broken-deployment.yaml
+# Purpose: Intentionally broken Deployment (bad image) for failure investigation labs
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-app
+  namespace: bizops-demo
+  labels:
+    app: broken-app
+    app.kubernetes.io/name: broken-app
+    app.kubernetes.io/part-of: bizops-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-app
+  template:
+    metadata:
+      labels:
+        app: broken-app
+        app.kubernetes.io/name: broken-app
+        app.kubernetes.io/part-of: bizops-demo
+    spec:
+      containers:
+        - name: httpd
+          image: registry.access.redhat.com/ubi9/httpd-24:does-not-exist
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

@@ -1,0 +1,59 @@
+---
+description: Conventions for the OpenShift BizOps Operations Workshop
+globs: "**/*.adoc,**/*.yaml,**/*.yml"
+alwaysApply: false
+---
+
+# Workshop Conventions
+
+## Repository Purpose
+
+Four one-hour progressive sessions that teach OpenShift day-2 BizOps skills on a single empty cluster: architecture and access, image/logs/scale/HA, deploy strategies and config, and troubleshooting with capacity awareness.
+
+## Structure
+
+- `documentation/` contains all AsciiDoc courseware content (Antora component)
+- `documentation/modules/ROOT/pages/` contains the course pages in `.adoc` format
+- YAML manifests live in the root step directories
+- `00-baseline/` - namespace, Deployment, Service, Route for the demo app
+- `02-day2/` - PodDisruptionBudget and related day-2 resources
+- `03-deploy-config/` - strategy variants, Secret, ConfigMap, tenant quota
+- `04-troubleshoot/` - broken and resource-intensive workloads for labs
+- Steps are progressive: each builds on the previous one
+
+## AsciiDoc Formatting
+
+- Every numbered step must have a *What* and *Why* pair in bold
+- Every step must have a collapsible verification block
+- Use `[.console-input]` before source blocks for commands
+- Use `[.console-output]` before source blocks showing expected output
+- Reference YAML manifests by file path in `oc apply -f` commands
+- Do not use em dashes. Use regular dashes (`-`) instead
+- Use `'''` for horizontal rules between steps
+- Cross-reference other pages with `xref:page.adoc[Label]`
+- External links use `link:URL[Label]`
+- Use `NOTE:`, `TIP:`, `IMPORTANT:`, `WARNING:` admonitions
+- All doc links must point to `docs.redhat.com` or `docs.openshift.com`
+- Use attributes from `_attributes.adoc` for version numbers
+
+## CLI Conventions
+
+- Every `oc` command must include an explicit `--context` flag (`cluster`)
+- Never use `oc login` inside step pages
+- YAML files with `${VARIABLE}` placeholders use `envsubst`
+- All workshop variables are exported once in `00-setup.adoc`
+
+## Content Rules
+
+- Never include customer names, user names, or email addresses
+- All content must be in English
+- Prefer `registry.access.redhat.com` or `registry.redhat.io` images
+- Use Red Hat / OpenShift-native components when they cover the use case
+- Mention Red Hat products because they fit the solution, not to promote them
+
+## YAML Conventions
+
+- Every YAML file starts with a comment block: filename and purpose
+- Use `app.kubernetes.io/part-of: bizops-demo` label consistently
+- Include resource requests and limits on Deployments
+- Include readiness and liveness probes where applicable

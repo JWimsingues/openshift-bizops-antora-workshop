@@ -1,0 +1,91 @@
+= OpenShift BizOps Operations Workshop
+:page-layout: home
+:!sectids:
+include::_attributes.adoc[]
+
+[.text-center.strong]
+== Day-2 operations on a single OpenShift cluster
+
+Four one-hour hands-on sessions for BizOps engineers. You start from an empty OpenShift cluster, deploy a sample application, then practice traffic flow, day-2 operations, safe configuration changes, troubleshooting, and capacity awareness.
+
+[.tiles.browse]
+== Browse Modules
+
+[.tile]
+.xref:00-setup.adoc[Cluster Setup]
+* xref:00-setup.adoc#prerequisites[Prerequisites]
+* xref:00-setup.adoc#export-variables[Export Variables]
+* xref:00-setup.adoc#deploy-baseline[Deploy Baseline App]
+
+[.tile]
+.xref:01-architecture-access.adoc[Session 1: Architecture and Access]
+* xref:01-architecture-access.adoc#traffic-flow[Traffic Flow]
+* xref:01-architecture-access.adoc#external-access[External Access]
+* xref:01-architecture-access.adoc#health[Health Checks]
+
+[.tile]
+.xref:02-day2-operations.adoc[Session 2: Day-2 Operations]
+* xref:02-day2-operations.adoc#inspect-image[Inspect Images]
+* xref:02-day2-operations.adoc#container-logs[Container Logs]
+* xref:02-day2-operations.adoc#scale[Scale and HA]
+
+[.tile]
+.xref:03-deploy-config.adoc[Session 3: Deploy and Config]
+* xref:03-deploy-config.adoc#strategies[Strategies and Rollback]
+* xref:03-deploy-config.adoc#sensitive-config[Secrets and ConfigMaps]
+* xref:03-deploy-config.adoc#multitenancy[Multitenancy Basics]
+
+[.tile]
+.xref:04-troubleshoot-capacity.adoc[Session 4: Troubleshoot and Capacity]
+* xref:04-troubleshoot-capacity.adoc#investigate[Investigate Failures]
+* xref:04-troubleshoot-capacity.adoc#collect-evidence[Collect Evidence]
+* xref:04-troubleshoot-capacity.adoc#capacity[Capacity Constraints]
+
+== Environment
+
+[cols="2,3",options="header"]
+|===
+| Item | Value
+
+| OpenShift version
+| {ocp-version}
+
+| Cluster contexts
+| Single context named `{cluster-context}`
+
+| Demo namespace
+| `{demo-namespace}`
+
+| Demo application
+| `{demo-app}` (UBI httpd)
+
+| Session length
+| 4 sessions x ~1 hour (+ setup)
+|===
+
+== Session Overview
+
+[cols="1,2,3",options="header"]
+|===
+| Session | Page | Focus
+
+| Prep
+| xref:00-setup.adoc[Cluster Setup]
+| Login, clone repo, deploy baseline app
+
+| 1
+| xref:01-architecture-access.adoc[Architecture and Access]
+| Traffic flow, Route access, deployment and health status
+
+| 2
+| xref:02-day2-operations.adoc[Day-2 Operations]
+| Images, logs, scale, high availability
+
+| 3
+| xref:03-deploy-config.adoc[Deploy and Config]
+| Strategies, rollback, Secrets/ConfigMaps, light multitenancy
+
+| 4
+| xref:04-troubleshoot-capacity.adoc[Troubleshoot and Capacity]
+| Failures, evidence, utilization, capacity
+|===

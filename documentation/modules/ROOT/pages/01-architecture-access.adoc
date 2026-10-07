@@ -1,0 +1,263 @@
+= Session 1 - Architecture and Access: See How Traffic Reaches Your App
+include::_attributes.adoc[]
+
+Map the path from Pod to Service to Route, confirm the application is reachable from outside the cluster, and practice reading deployment and health status. This session builds on the baseline app from xref:00-setup.adoc[Cluster Setup].
+
+== Prerequisites
+
+* Baseline application deployed from xref:00-setup.adoc[Cluster Setup]
+* `oc` authenticated with context `{cluster-context}`
+* Working directory is the workshop repository root
+
+NOTE: This session is mostly inspection. You will not replace the demo app yet.
+
+== How It Works
+
+OpenShift exposes HTTP applications with this common path:
+
+. Pods run containers and listen on a container port (8080 for this demo).
+. A Service selects pods by label and provides a stable ClusterIP.
+. A Route points at the Service so the cluster ingress (router) can admit external traffic.
+
+Understanding that chain is the foundation for every later operations task.
+
+== Steps to Apply
+
+[#traffic-flow]
+=== 1. Map Pod to Service to Route
+
+*What:* List the core objects and confirm labels and selectors line up.
+
+*Why:* Most "app is down" tickets start with a broken link in this chain (wrong selector, no endpoints, Route not admitted).
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods,svc,route -n bizops-demo -o wide --context {cluster-context}
+oc get endpoints demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Endpoints list Ready pod IPs on port 8080
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc describe svc demo-app -n bizops-demo --context {cluster-context} | sed -n '1,25p'
+----
+
+[.console-output]
+[source,bash]
+----
+Name:              demo-app
+Namespace:         bizops-demo
+Selector:          app=demo-app
+Type:              ClusterIP
+IP:                172.30.x.x
+Port:              http  8080/TCP
+Endpoints:         10.128.x.x:8080,10.129.x.x:8080
+----
+====
+
+'''
+
+[#external-access]
+=== 2. Verify external application access
+
+*What:* Resolve the Route hostname and request the application over HTTP.
+
+*Why:* BizOps must confirm users can reach the app from outside the cluster, not only that pods are Running.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+export ROUTE_HOST=$(oc get route demo-app -n bizops-demo -o jsonpath='{.spec.host}' --context {cluster-context})
+echo "https://${ROUTE_HOST}"
+curl -sI "http://${ROUTE_HOST}" | head -n 5
+----
+
+NOTE: Some clusters terminate TLS on the router and redirect HTTP to HTTPS. If `curl` follows redirects or fails TLS verification against a workshop CA, use `curl -skI "https://${ROUTE_HOST}"` and prefer trusting the cluster CA in production.
+
+.Verify: HTTP response is successful (2xx or expected redirect)
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+curl -s -o /dev/null -w "%{http_code}\n" "http://${ROUTE_HOST}"
+----
+
+[.console-output]
+[source,bash]
+----
+200
+----
+====
+
+'''
+
+[#deployment-status]
+=== 3. Review deployment status
+
+*What:* Inspect the Deployment, ReplicaSet, and rollout history.
+
+*Why:* Deployment status tells you whether the desired replica count and image revision are actually live.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get deploy,rs -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+oc rollout history deployment/demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Desired and available replicas match
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get deployment demo-app -n bizops-demo -o wide --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES
+demo-app   2/2     2            2           10m   httpd        registry.access.redhat.com/ubi9/httpd-24:latest
+----
+====
+
+'''
+
+[#health]
+=== 4. Monitor pod, application, and service health
+
+*What:* Check Ready conditions, recent events, and probe configuration.
+
+*Why:* Running is not the same as Ready. Probes and events explain why traffic may be failing even when pods exist.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo --context {cluster-context}
+oc get events -n bizops-demo --sort-by='.lastTimestamp' --context {cluster-context} | tail -n 20
+oc get pod -n bizops-demo -l app=demo-app -o jsonpath='{range .items[*]}{.metadata.name}{" ready="}{.status.conditions[?(@.type=="Ready")].status}{"\n"}{end}' --context {cluster-context}
+----
+
+.Verify: Both demo-app pods report Ready=True
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo -l app=demo-app --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+demo-app-6d8f7c9b4d-abc12   1/1     Running   0          10m
+demo-app-6d8f7c9b4d-def34   1/1     Running   0          10m
+----
+====
+
+'''
+
+[#traffic-routing]
+=== 5. Inspect light traffic routing
+
+*What:* Read Route weight and Service port mapping that steer traffic to the demo app.
+
+*Why:* BizOps often adjusts Route weights or Service target ports when shifting traffic between backends; start by reading the current path.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get route demo-app -n bizops-demo -o yaml --context {cluster-context} | sed -n '/^spec:/,/^status:/p'
+oc get svc demo-app -n bizops-demo -o yaml --context {cluster-context} | sed -n '/^spec:/,/^status:/p'
+----
+
+.Verify: Route targets Service `demo-app` with weight 100 and port `http`
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get route demo-app -n bizops-demo -o jsonpath='service={.spec.to.name} weight={.spec.to.weight} port={.spec.port.targetPort}{"\n"}' --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+service=demo-app weight=100 port=http
+----
+====
+
+== What This Solves (Compared to Setup)
+
+[cols="2,3",options="header"]
+|===
+| Problem from Setup | How This Session Solves It
+
+| App is deployed but traffic path is unclear
+| You can explain Pod → Service → Route → router
+
+| Unsure if users can reach the app
+| Route host and `curl` confirm external access
+
+| Health is only "pods exist"
+| Ready conditions, events, and Deployment status give a fuller picture
+|===
+
+== What This Does NOT Solve (Yet)
+
+[cols="2,3",options="header"]
+|===
+| Remaining Problem | Addressed In
+
+| Which image digest is actually running, and how to read logs
+| xref:02-day2-operations.adoc[Session 2]
+
+| Scaling and HA controls
+| xref:02-day2-operations.adoc[Session 2]
+
+| Changing strategy, secrets, or tenant boundaries
+| xref:03-deploy-config.adoc[Session 3]
+|===
+
+== Official Documentation
+
+* link:https://docs.openshift.com/container-platform/latest/networking/understanding-networking.html[Understanding networking]
+* link:https://docs.openshift.com/container-platform/latest/networking/routes/route-configuration.html[Route configuration]
+* link:https://docs.openshift.com/container-platform/latest/applications/deployments/what-deployments-are.html[Understanding Deployments]
+
+== Alternatives Considered
+
+[cols="2,4",options="header"]
+|===
+| Approach | Notes
+
+| OpenShift Route + Service
+| Fits empty OCP clusters and this workshop without extra operators
+
+| Kubernetes Ingress only
+| Valid on some platforms; Route is the native OpenShift path used here
+
+| Service mesh traffic shifting
+| Powerful but out of scope for a one-hour BizOps intro
+|===
+
+'''
+
+== Reset
+
+This session only inspected resources. No reset is required. If the baseline app was changed accidentally, re-apply setup manifests:
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 00-baseline/ --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----

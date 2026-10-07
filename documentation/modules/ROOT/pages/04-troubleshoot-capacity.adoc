@@ -1,0 +1,280 @@
+= Session 4 - Troubleshoot and Capacity: Failures, Evidence, and Headroom
+include::_attributes.adoc[]
+
+Deploy intentionally broken and resource-hungry workloads, practice a short investigation loop, collect evidence, and read node/pod utilization to spot capacity pressure. Builds on xref:03-deploy-config.adoc[Session 3].
+
+== Prerequisites
+
+* Completed xref:03-deploy-config.adoc[Session 3] (or at least a healthy baseline `demo-app`)
+* Metrics available via `oc adm top` (OpenShift monitoring stack on the cluster)
+* Context `{cluster-context}` available
+
+NOTE: If `oc adm top` returns an error about metrics, wait a few minutes for the monitoring stack on a fresh cluster, then retry.
+
+== How It Works
+
+A practical BizOps loop:
+
+. Reproduce or deploy the failing object.
+. Read status, events, and logs.
+. Capture evidence (commands and outputs) before changing anything.
+. Fix the smallest thing that restores service.
+. Check whether CPU/memory requests leave the cluster with enough headroom.
+
+== Steps to Apply
+
+[#investigate]
+=== 1. Investigate application failures
+
+icon:clock[] ~1 minute (ImagePullBackOff and CrashLoopBackOff appear quickly)
+
+*What:* Apply a bad-image Deployment and a crash-loop Deployment, then diagnose each.
+
+*Why:* Image pull failures and crash loops are among the most common production tickets.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 04-troubleshoot/broken-deployment.yaml --context {cluster-context}
+oc apply -f 04-troubleshoot/crashloop-deployment.yaml --context {cluster-context}
+sleep 20
+oc get pods -n bizops-demo --context {cluster-context}
+oc describe deployment broken-app -n bizops-demo --context {cluster-context} | sed -n '/Events/,$p'
+oc describe pod -n bizops-demo -l app=crash-app --context {cluster-context} | sed -n '/Events/,$p'
+----
+
+.Verify: You can name the failure modes (ImagePullBackOff and CrashLoopBackOff)
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo -l 'app in (broken-app,crash-app)' --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                          READY   STATUS             RESTARTS   AGE
+broken-app-...                0/1     ImagePullBackOff   0          30s
+crash-app-...                 0/1     CrashLoopBackOff   2          30s
+----
+====
+
+'''
+
+[#collect-evidence]
+=== 2. Collect troubleshooting data and evidence
+
+*What:* Capture pod YAML snippets, events, and logs into files you could attach to a ticket.
+
+*Why:* Evidence collected before a fix preserves the failure signature for post-incident review.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+mkdir -p /tmp/bizops-evidence
+oc get pods -n bizops-demo -o wide --context {cluster-context} > /tmp/bizops-evidence/pods.txt
+oc get events -n bizops-demo --sort-by='.lastTimestamp' --context {cluster-context} > /tmp/bizops-evidence/events.txt
+oc logs -n bizops-demo -l app=crash-app --tail=50 --context {cluster-context} > /tmp/bizops-evidence/crash-logs.txt || true
+oc get deployment broken-app,crash-app -n bizops-demo -o yaml --context {cluster-context} > /tmp/bizops-evidence/deployments.yaml
+ls -l /tmp/bizops-evidence
+----
+
+TIP: For cluster-wide platform issues (not this lab), `oc adm must-gather` collects a support bundle. Prefer scoped evidence first for application failures.
+
+.Verify: Evidence directory contains pods, events, and deployment YAML
+[%collapsible]
+====
+[.console-input]
+[source,bash]
+----
+ls /tmp/bizops-evidence
+----
+
+[.console-output]
+[source,bash]
+----
+crash-logs.txt
+deployments.yaml
+events.txt
+pods.txt
+----
+====
+
+'''
+
+[#utilization]
+=== 3. Monitor workload health and resource utilization
+
+icon:clock[] ~30 seconds (hungry workload starts; metrics update shortly after)
+
+*What:* Deploy a CPU-busy workload with elevated requests and inspect `oc adm top` for pods and nodes.
+
+*Why:* Utilization shows whether the app is hot and whether nodes still have schedulable capacity.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 04-troubleshoot/hungry-deployment.yaml --context {cluster-context}
+oc rollout status deployment/hungry-app -n bizops-demo --context {cluster-context}
+oc adm top pods -n bizops-demo --context {cluster-context}
+oc adm top nodes --context {cluster-context}
+----
+
+.Verify: `hungry-app` appears in pod metrics; node metrics show CPU/memory columns
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc adm top pods -n bizops-demo --context {cluster-context} | grep -E 'NAME|hungry|demo-app' || true
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                         CPU(cores)   MEMORY(bytes)
+demo-app-...                 2m           40Mi
+hungry-app-...               450m         20Mi
+----
+====
+
+'''
+
+[#capacity]
+=== 4. Identify potential capacity constraints
+
+*What:* Compare pod requests to node allocatable resources and note what would block further scale-out.
+
+*Why:* Capacity problems often show up as Pending pods with failed scheduling, not only as high CPU on a running pod.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc describe nodes --context {cluster-context} | sed -n '/Allocated resources/,+12p'
+oc get pods -n bizops-demo -o custom-columns=NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory --context {cluster-context}
+----
+
+IMPORTANT: On a small workshop cluster, the hungry workload's `500m` request may already be a meaningful fraction of a worker. Treat Pending pods with `Insufficient cpu` / `Insufficient memory` events as capacity signals.
+
+.Verify: You can list request totals per pod and relate them to node Allocated resources
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo --field-selector=status.phase=Pending --context {cluster-context} || true
+oc get events -n bizops-demo --field-selector reason=FailedScheduling --context {cluster-context} | tail -n 5 || true
+----
+
+[.console-output]
+[source,bash]
+----
+No resources found in bizops-demo namespace.
+(or FailedScheduling events if the cluster is tight on CPU/memory)
+----
+====
+
+'''
+
+=== 5. Restore a healthy demo namespace
+
+icon:clock[] ~30 seconds
+
+*What:* Delete the broken/hungry lab Deployments and confirm `demo-app` remains healthy.
+
+*Why:* Leave the cluster clean for the next participant or a re-run of earlier sessions.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc delete -f 04-troubleshoot/ --ignore-not-found --context {cluster-context}
+oc get pods -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Only demo-app pods remain and are Ready
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+demo-app-...                1/1     Running   0          5m
+demo-app-...                1/1     Running   0          5m
+----
+====
+
+== What This Solves (Compared to Session 3)
+
+[cols="2,3",options="header"]
+|===
+| Problem from Session 3 | How This Session Solves It
+
+| No structured failure drill
+| ImagePullBackOff and CrashLoopBackOff investigation
+
+| No evidence bundle habit
+| Files under `/tmp/bizops-evidence`
+
+| No capacity lens
+| `oc adm top` plus request vs allocatable review
+|===
+
+== What This Does NOT Solve (Yet)
+
+[cols="2,3",options="header"]
+|===
+| Remaining Problem | Addressed In
+
+| Deep Prometheus/Grafana dashboards
+| Out of scope for these four core sessions (advanced topic)
+
+| Multi-container pod patterns and advanced networking
+| Out of scope for these four core sessions (advanced topic)
+|===
+
+== Official Documentation
+
+* link:https://docs.openshift.com/container-platform/latest/support/troubleshooting/investigating-pod-issues.html[Investigating pod issues]
+* link:https://docs.openshift.com/container-platform/latest/support/gathering-cluster-data.html[Gathering data about your cluster]
+* link:https://docs.openshift.com/container-platform/latest/nodes/clusters/nodes-cluster-resource-levels.html[Estimating resource levels]
+
+== Alternatives Considered
+
+[cols="2,4",options="header"]
+|===
+| Approach | Notes
+
+| `oc describe` / events / logs / `oc adm top`
+| Fast, no extra tools, works on empty OCP with monitoring
+
+| Full `oc adm must-gather` for every app ticket
+| Excellent for platform bugs; heavier than needed for app ImagePullBackOff
+
+| External APM only
+| Useful complement; not a substitute for cluster-native evidence
+|===
+
+'''
+
+== Reset
+
+Deletes lab Deployments in reverse of creation intent and leaves the baseline demo app in place. Namespace deletion is left to xref:00-setup.adoc#reset[Setup Reset] if you want a full teardown.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc delete -f 04-troubleshoot/hungry-deployment.yaml --ignore-not-found --context {cluster-context}
+oc delete -f 04-troubleshoot/crashloop-deployment.yaml --ignore-not-found --context {cluster-context}
+oc delete -f 04-troubleshoot/broken-deployment.yaml --ignore-not-found --context {cluster-context}
+oc apply -f 00-baseline/ --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----

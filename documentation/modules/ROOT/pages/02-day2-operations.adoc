@@ -1,0 +1,222 @@
+= Session 2 - Day-2 Operations: Images, Logs, Scale, and HA
+include::_attributes.adoc[]
+
+Operate on the running demo application: confirm which image is live, read container logs, scale replicas, and apply a simple high-availability guard with a PodDisruptionBudget. Builds on xref:01-architecture-access.adoc[Session 1].
+
+== Prerequisites
+
+* Completed xref:01-architecture-access.adoc[Session 1]
+* Baseline `demo-app` Deployment healthy in `{demo-namespace}`
+* Context `{cluster-context}` active via `source myenv.sh`
+
+== How It Works
+
+Day-2 work usually answers four questions: What image is running? What did the container print? How many copies do we need? Can we survive a node drain without dropping all capacity?
+
+== Steps to Apply
+
+[#inspect-image]
+=== 1. Inspect the running image
+
+*What:* Compare the Deployment image reference with the resolved image ID on each pod.
+
+*Why:* Tags such as `latest` move; digests tell you what is actually running versus what the repository currently serves.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}' --context {cluster-context}
+oc get pods -n bizops-demo -l app=demo-app -o jsonpath='{range .items[*]}{.metadata.name}{"\n  image="}{.status.containerStatuses[0].image}{"\n  imageID="}{.status.containerStatuses[0].imageID}{"\n"}{end}' --context {cluster-context}
+----
+
+TIP: In production, prefer digest-pinned images (`@sha256:...`) so rollouts are reproducible.
+
+.Verify: Both pods share the same imageID
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo -l app=demo-app -o jsonpath='{range .items[*]}{.status.containerStatuses[0].imageID}{"\n"}{end}' --context {cluster-context} | sort -u | wc -l
+----
+
+[.console-output]
+[source,bash]
+----
+1
+----
+====
+
+'''
+
+[#container-logs]
+=== 2. View container logs
+
+*What:* Stream logs from one demo-app pod and note how to fetch previous instance logs after a restart.
+
+*Why:* Central log pipelines may drop or delay data; cluster-side logs are the authoritative first stop during an incident.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+export POD=$(oc get pod -n bizops-demo -l app=demo-app -o jsonpath='{.items[0].metadata.name}' --context {cluster-context})
+oc logs "$POD" -n bizops-demo --tail=50 --context {cluster-context}
+----
+
+NOTE: After a crash or restart, use `oc logs "$POD" -n bizops-demo --previous --context {cluster-context}` to read the prior container instance.
+
+.Verify: Log output includes httpd access or startup lines
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc logs "$POD" -n bizops-demo --tail=5 --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+... httpd / container startup or access log lines ...
+----
+====
+
+'''
+
+[#scale]
+=== 3. Scale the workload
+
+icon:clock[] ~30 seconds (new pods become Ready)
+
+*What:* Scale `demo-app` up to 3 replicas, then back to 2.
+
+*Why:* Scaling is the fastest capacity response for stateless frontends when load or availability needs change.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc scale deployment/demo-app --replicas=3 -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+oc get pods -n bizops-demo -l app=demo-app --context {cluster-context}
+oc scale deployment/demo-app --replicas=2 -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Deployment reports 2/2 Ready after scaling back
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get deployment demo-app -n bizops-demo --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+demo-app   2/2     2            2           30m
+----
+====
+
+'''
+
+[#ha]
+=== 4. Configure and validate high availability basics
+
+*What:* Keep at least two replicas and apply a PodDisruptionBudget that requires one pod to remain available.
+
+*Why:* Replicas alone are not HA policy; a PDB documents the disruption budget for drains and voluntary evictions.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 02-day2/pdb.yaml --context {cluster-context}
+oc get pdb -n bizops-demo --context {cluster-context}
+----
+
+.Verify: PDB shows `MIN AVAILABLE` of 1 and allows disruptions when 2 pods are Ready
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pdb demo-app -n bizops-demo --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME       MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+demo-app   1               N/A               1                     30s
+----
+====
+
+TIP: HA also depends on pod anti-affinity and topology. This session stays shallow on purpose; topology constraints are a follow-on topic.
+
+== What This Solves (Compared to Session 1)
+
+[cols="2,3",options="header"]
+|===
+| Problem from Session 1 | How This Session Solves It
+
+| Unknown which image bits are live
+| Image and imageID inspection on pods
+
+| No cluster-side log practice
+| `oc logs` (and `--previous`) against the app
+
+| Fixed replica count with no HA policy
+| Scale practice plus a PodDisruptionBudget
+|===
+
+== What This Does NOT Solve (Yet)
+
+[cols="2,3",options="header"]
+|===
+| Remaining Problem | Addressed In
+
+| How to change strategy and roll back a bad image
+| xref:03-deploy-config.adoc[Session 3]
+
+| How to inject and manage Secrets / ConfigMaps
+| xref:03-deploy-config.adoc[Session 3]
+
+| How to investigate broken pods and capacity pressure
+| xref:04-troubleshoot-capacity.adoc[Session 4]
+|===
+
+== Official Documentation
+
+* link:https://docs.openshift.com/container-platform/latest/nodes/containers/nodes-containers-using.html[Understanding containers]
+* link:https://docs.openshift.com/container-platform/latest/nodes/clusters/nodes-cluster-scaling-cli.html[Manually scaling a Deployment]
+* link:https://docs.openshift.com/container-platform/latest/nodes/pods/nodes-pods-configuring.html#nodes-pods-configuring-pod-distruption-about_nodes-pods-configuring[Understanding how to use pod disruption budgets]
+
+== Alternatives Considered
+
+[cols="2,4",options="header"]
+|===
+| Approach | Notes
+
+| Manual `oc scale`
+| Fast for labs and emergencies
+
+| Horizontal Pod Autoscaler
+| Better for production load patterns; skipped to keep this hour focused
+
+| External log stack only
+| Valuable, but BizOps still needs cluster-local logs when shipping lags
+|===
+
+'''
+
+== Reset
+
+Removes the PDB and returns the Deployment to 2 replicas. Order: scale first so the PDB is easier to satisfy, then delete the PDB.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc scale deployment/demo-app --replicas=2 -n bizops-demo --context {cluster-context}
+oc delete -f 02-day2/pdb.yaml --ignore-not-found --context {cluster-context}
+----

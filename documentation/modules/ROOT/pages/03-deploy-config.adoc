@@ -1,0 +1,251 @@
+= Session 3 - Deploy and Config: Strategies, Rollback, and Tenancy Basics
+include::_attributes.adoc[]
+
+Change how the demo app rolls out, practice an image rollback, wire ConfigMap and Secret values into the Deployment, and take a brief look at multitenancy with a second namespace and ResourceQuota. Builds on xref:02-day2-operations.adoc[Session 2].
+
+== Prerequisites
+
+* Completed xref:02-day2-operations.adoc[Session 2]
+* `demo-app` healthy with at least 2 replicas
+* Context `{cluster-context}` available
+
+== How It Works
+
+* *RollingUpdate* replaces pods gradually so some replicas stay available.
+* *Recreate* terminates all pods before creating new ones (brief downtime).
+* ConfigMaps hold non-secret settings; Secrets hold sensitive values. Both can be injected as environment variables.
+* Namespaces plus quotas are a lightweight multitenancy boundary (this session does not deep-dive RBAC).
+
+== Steps to Apply
+
+[#strategies]
+=== 1. Compare RollingUpdate and Recreate
+
+icon:clock[] ~1 minute per strategy change (rollout completion)
+
+*What:* Apply ConfigMap and Secret, switch the Deployment to Recreate, observe the rollout, then restore RollingUpdate.
+
+*Why:* BizOps must know when a full cutover is acceptable versus when a rolling update is required for availability.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 03-deploy-config/configmap.yaml --context {cluster-context}
+oc apply -f 03-deploy-config/secret.yaml --context {cluster-context}
+oc apply -f 03-deploy-config/deployment-recreate.yaml --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.strategy.type}{"\n"}' --context {cluster-context}
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 03-deploy-config/deployment-rolling.yaml --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.strategy.type}{"\n"}' --context {cluster-context}
+----
+
+.Verify: Strategy is RollingUpdate again
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get deployment demo-app -n bizops-demo -o jsonpath='strategy={.spec.strategy.type}{"\n"}' --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+strategy=RollingUpdate
+----
+====
+
+'''
+
+[#rollback]
+=== 2. Roll back a bad image change
+
+icon:clock[] ~1-2 minutes (failed pull attempt, then undo and Ready)
+
+*What:* Point the Deployment at a non-existent tag, observe the bad revision, then roll back.
+
+*Why:* Rollbacks are the fastest recovery when a new image never becomes Ready.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc set image deployment/demo-app httpd=registry.access.redhat.com/ubi9/httpd-24:does-not-exist -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --timeout=60s --context {cluster-context} || true
+oc get pods -n bizops-demo -l app=demo-app --context {cluster-context}
+oc rollout undo deployment/demo-app -n bizops-demo --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+----
+
+.Verify: Pods are Ready again on a valid image
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get pods -n bizops-demo -l app=demo-app --context {cluster-context}
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}' --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+NAME                        READY   STATUS    RESTARTS   AGE
+demo-app-...                1/1     Running   0          30s
+demo-app-...                1/1     Running   0          30s
+registry.access.redhat.com/ubi9/httpd-24:latest
+----
+====
+
+'''
+
+[#sensitive-config]
+=== 3. Review and manage sensitive configuration
+
+*What:* Confirm Secret and ConfigMap exist and are referenced by the Deployment env vars.
+
+*Why:* Mis-mounted secrets and config are a common cause of start failures; BizOps must validate both objects and references.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get configmap demo-app-config -n bizops-demo -o yaml --context {cluster-context}
+oc get secret demo-app-secret -n bizops-demo -o jsonpath='{.type}{" keys="}{.data}{"\n"}' --context {cluster-context}
+oc set env deployment/demo-app --list -n bizops-demo --context {cluster-context}
+----
+
+WARNING: Do not print Secret values in shared terminals or chat logs. Use key existence checks, not `oc get secret -o yaml` with decoded data in recordings.
+
+.Verify: Deployment lists APP_MESSAGE and APP_TOKEN from ConfigMap/Secret
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc set env deployment/demo-app --list -n bizops-demo --context {cluster-context}
+----
+
+[.console-output]
+[source,bash]
+----
+# deployments/demo-app, container httpd
+APP_MESSAGE from configmap demo-app-config / key: message
+APP_TOKEN from secret demo-app-secret / key: token
+----
+====
+
+'''
+
+[#multitenancy]
+=== 4. Multitenancy settings (brief)
+
+*What:* Create a second namespace with a ResourceQuota that caps pods, CPU, and memory.
+
+*Why:* Soft multitenancy on OpenShift often starts with namespaces and quotas so one team cannot consume the whole cluster. RBAC depth is out of scope for this hour.
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 03-deploy-config/tenant-namespace.yaml --context {cluster-context}
+oc apply -f 03-deploy-config/resourcequota.yaml --context {cluster-context}
+oc get resourcequota -n bizops-tenant-a --context {cluster-context}
+oc describe resourcequota team-a-quota -n bizops-tenant-a --context {cluster-context}
+----
+
+.Verify: Hard limits show pods=10 and CPU/memory caps
+[%collapsible]
+====
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc get resourcequota team-a-quota -n bizops-tenant-a -o yaml --context {cluster-context} | sed -n '/hard:/,/used:/p'
+----
+
+[.console-output]
+[source,bash]
+----
+  hard:
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    requests.cpu: "1"
+    requests.memory: 1Gi
+----
+====
+
+== What This Solves (Compared to Session 2)
+
+[cols="2,3",options="header"]
+|===
+| Problem from Session 2 | How This Session Solves It
+
+| Only one deployment strategy exercised
+| Recreate vs RollingUpdate comparison
+
+| No recovery drill for a bad image
+| `oc rollout undo` after a failed image set
+
+| No practice with Secrets / ConfigMaps
+| Objects created and referenced on the Deployment
+
+| No tenant boundary example
+| Second namespace with ResourceQuota
+|===
+
+== What This Does NOT Solve (Yet)
+
+[cols="2,3",options="header"]
+|===
+| Remaining Problem | Addressed In
+
+| Systematic failure investigation and evidence collection
+| xref:04-troubleshoot-capacity.adoc[Session 4]
+
+| Measuring utilization and spotting capacity pressure
+| xref:04-troubleshoot-capacity.adoc[Session 4]
+|===
+
+== Official Documentation
+
+* link:https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html[Deployment strategies]
+* link:https://docs.openshift.com/container-platform/latest/applications/deployments/managing-deployment-processes.html#deployments-rolling-back_configuring-deployments[Rolling back a Deployment]
+* link:https://docs.openshift.com/container-platform/latest/nodes/pods/nodes-pods-configuring.html[Configuring how pods run]
+* link:https://docs.openshift.com/container-platform/latest/applications/quotas/quotas-setting-per-project.html[Resource quotas per project]
+
+== Alternatives Considered
+
+[cols="2,4",options="header"]
+|===
+| Approach | Notes
+
+| Deployment strategy + rollout undo
+| Native, no extra operators, ideal for BizOps drills
+
+| GitOps progressive delivery
+| Strong for production change control; heavier than this lab needs
+
+| Full RBAC multitenancy design
+| Important in real estates; intentionally shallow here
+|===
+
+'''
+
+== Reset
+
+Restore the rolling baseline Deployment, remove workshop config objects, and delete the tenant namespace. Order matters: remove dependent Deployment env refs by re-applying baseline before deleting Secret/ConfigMap; delete tenant namespace last (it cascades the quota).
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+oc apply -f 00-baseline/deployment.yaml --context {cluster-context}
+oc rollout status deployment/demo-app -n bizops-demo --context {cluster-context}
+oc delete -f 03-deploy-config/secret.yaml --ignore-not-found --context {cluster-context}
+oc delete -f 03-deploy-config/configmap.yaml --ignore-not-found --context {cluster-context}
+oc delete -f 03-deploy-config/resourcequota.yaml --ignore-not-found --context {cluster-context}
+oc delete -f 03-deploy-config/tenant-namespace.yaml --ignore-not-found --wait --context {cluster-context}
+----
