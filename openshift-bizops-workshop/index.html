@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenShift BizOps Operations Workshop :: OpenShift BizOps Operations Workshop</title>
+    <link rel="canonical" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/index.html">
+    <link rel="next" href="00-setup.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop">OpenShift BizOps Operations Workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="openshift-bizops-workshop" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">OpenShift BizOps Operations Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="00-setup.html">Cluster Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#prerequisites">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#export-variables">Export Workshop Variables</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#login-cluster">Log In to the Cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#clone-repo">Clone the Repository</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#deploy-baseline">Deploy the Baseline App</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-architecture-access.html">Session 1: Architecture and Access</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-flow">Traffic Flow</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#external-access">External Access</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#deployment-status">Deployment Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#health">Health Checks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-routing">Traffic Routing</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-day2-operations.html">Session 2: Day-2 Operations</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#inspect-image">Inspect Images</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#container-logs">Container Logs</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#scale">Scale Workloads</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#ha">High Availability</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-deploy-config.html">Session 3: Deploy and Config</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#strategies">Deployment Strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#rollback">Rollback</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#sensitive-config">Sensitive Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#multitenancy">Multitenancy Basics</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-troubleshoot-capacity.html">Session 4: Troubleshoot and Capacity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#investigate">Investigate Failures</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#collect-evidence">Collect Evidence</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#utilization">Resource Utilization</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#capacity">Capacity Constraints</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift BizOps Operations Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">OpenShift BizOps Operations Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">OpenShift BizOps Operations Workshop</a></li>
+    <li><a href="index.html">Overview</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/JWimsingues/openshift-bizops-antora-workshop/edit/main/documentation/modules/ROOT/pages/index.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">OpenShift BizOps Operations Workshop</h1>
+<div class="sect1 text-center strong">
+<h2>Day-2 operations on a single OpenShift cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Four one-hour hands-on sessions for BizOps engineers. You start from an empty OpenShift cluster, deploy a sample application, then practice traffic flow, day-2 operations, safe configuration changes, troubleshooting, and capacity awareness.</p>
+</div>
+</div>
+</div>
+<div class="sect1 tiles browse">
+<h2>Browse Modules</h2>
+<div class="sectionbody">
+<div class="ulist tile">
+<div class="title"><a href="00-setup.html" class="xref page">Cluster Setup</a></div>
+<ul>
+<li>
+<p><a href="00-setup.html#prerequisites" class="xref page">Prerequisites</a></p>
+</li>
+<li>
+<p><a href="00-setup.html#export-variables" class="xref page">Export Variables</a></p>
+</li>
+<li>
+<p><a href="00-setup.html#deploy-baseline" class="xref page">Deploy Baseline App</a></p>
+</li>
+</ul>
+</div>
+<div class="ulist tile">
+<div class="title"><a href="01-architecture-access.html" class="xref page">Session 1: Architecture and Access</a></div>
+<ul>
+<li>
+<p><a href="01-architecture-access.html#traffic-flow" class="xref page">Traffic Flow</a></p>
+</li>
+<li>
+<p><a href="01-architecture-access.html#external-access" class="xref page">External Access</a></p>
+</li>
+<li>
+<p><a href="01-architecture-access.html#health" class="xref page">Health Checks</a></p>
+</li>
+</ul>
+</div>
+<div class="ulist tile">
+<div class="title"><a href="02-day2-operations.html" class="xref page">Session 2: Day-2 Operations</a></div>
+<ul>
+<li>
+<p><a href="02-day2-operations.html#inspect-image" class="xref page">Inspect Images</a></p>
+</li>
+<li>
+<p><a href="02-day2-operations.html#container-logs" class="xref page">Container Logs</a></p>
+</li>
+<li>
+<p><a href="02-day2-operations.html#scale" class="xref page">Scale and HA</a></p>
+</li>
+</ul>
+</div>
+<div class="ulist tile">
+<div class="title"><a href="03-deploy-config.html" class="xref page">Session 3: Deploy and Config</a></div>
+<ul>
+<li>
+<p><a href="03-deploy-config.html#strategies" class="xref page">Strategies and Rollback</a></p>
+</li>
+<li>
+<p><a href="03-deploy-config.html#sensitive-config" class="xref page">Secrets and ConfigMaps</a></p>
+</li>
+<li>
+<p><a href="03-deploy-config.html#multitenancy" class="xref page">Multitenancy Basics</a></p>
+</li>
+</ul>
+</div>
+<div class="ulist tile">
+<div class="title"><a href="04-troubleshoot-capacity.html" class="xref page">Session 4: Troubleshoot and Capacity</a></div>
+<ul>
+<li>
+<p><a href="04-troubleshoot-capacity.html#investigate" class="xref page">Investigate Failures</a></p>
+</li>
+<li>
+<p><a href="04-troubleshoot-capacity.html#collect-evidence" class="xref page">Collect Evidence</a></p>
+</li>
+<li>
+<p><a href="04-troubleshoot-capacity.html#capacity" class="xref page">Capacity Constraints</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2>Environment</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Item</th>
+<th class="tableblock halign-left valign-top">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4.16+</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster contexts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Single context named <code>cluster</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Demo namespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>bizops-demo</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Demo application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>demo-app</code> (UBI httpd)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Session length</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4 sessions x ~1 hour (+ setup)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2>Session Overview</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Session</th>
+<th class="tableblock halign-left valign-top">Page</th>
+<th class="tableblock halign-left valign-top">Focus</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Prep</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="00-setup.html" class="xref page">Cluster Setup</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Login, clone repo, deploy baseline app</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="01-architecture-access.html" class="xref page">Architecture and Access</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Traffic flow, Route access, deployment and health status</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="02-day2-operations.html" class="xref page">Day-2 Operations</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Images, logs, scale, high availability</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="03-deploy-config.html" class="xref page">Deploy and Config</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Strategies, rollback, Secrets/ConfigMaps, light multitenancy</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="04-troubleshoot-capacity.html" class="xref page">Troubleshoot and Capacity</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Failures, evidence, utilization, capacity</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<nav class="pagination">
+  <span class="next"><a href="00-setup.html" class="query-params-link">Cluster Setup</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

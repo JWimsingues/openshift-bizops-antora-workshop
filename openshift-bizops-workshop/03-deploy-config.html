@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenShift BizOps Operations Workshop :: OpenShift BizOps Operations Workshop</title>
+    <link rel="canonical" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/03-deploy-config.html">
+    <link rel="prev" href="02-day2-operations.html">
+    <link rel="next" href="04-troubleshoot-capacity.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop">OpenShift BizOps Operations Workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="openshift-bizops-workshop" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">OpenShift BizOps Operations Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="00-setup.html">Cluster Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#prerequisites">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#export-variables">Export Workshop Variables</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#login-cluster">Log In to the Cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#clone-repo">Clone the Repository</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#deploy-baseline">Deploy the Baseline App</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-architecture-access.html">Session 1: Architecture and Access</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-flow">Traffic Flow</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#external-access">External Access</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#deployment-status">Deployment Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#health">Health Checks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-routing">Traffic Routing</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-day2-operations.html">Session 2: Day-2 Operations</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#inspect-image">Inspect Images</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#container-logs">Container Logs</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#scale">Scale Workloads</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#ha">High Availability</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-deploy-config.html">Session 3: Deploy and Config</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#strategies">Deployment Strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#rollback">Rollback</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#sensitive-config">Sensitive Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#multitenancy">Multitenancy Basics</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-troubleshoot-capacity.html">Session 4: Troubleshoot and Capacity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#investigate">Investigate Failures</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#collect-evidence">Collect Evidence</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#utilization">Resource Utilization</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="04-troubleshoot-capacity.html#capacity">Capacity Constraints</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift BizOps Operations Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">OpenShift BizOps Operations Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">OpenShift BizOps Operations Workshop</a></li>
+    <li><a href="03-deploy-config.html">Session 3: Deploy and Config</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/JWimsingues/openshift-bizops-antora-workshop/edit/main/documentation/modules/ROOT/pages/03-deploy-config.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">OpenShift BizOps Operations Workshop</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Change how the demo app rolls out, practice an image rollback, wire ConfigMap and Secret values into the Deployment, and take a brief look at multitenancy with a second namespace and ResourceQuota. Builds on <a href="02-day2-operations.html" class="xref page">Session 2</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Completed <a href="02-day2-operations.html" class="xref page">Session 2</a></p>
+</li>
+<li>
+<p><code>demo-app</code> healthy with at least 2 replicas</p>
+</li>
+<li>
+<p>Context <code>cluster</code> available</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_it_works"><a class="anchor" href="#_how_it_works"></a>How It Works</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>RollingUpdate</strong> replaces pods gradually so some replicas stay available.</p>
+</li>
+<li>
+<p><strong>Recreate</strong> terminates all pods before creating new ones (brief downtime).</p>
+</li>
+<li>
+<p>ConfigMaps hold non-secret settings; Secrets hold sensitive values. Both can be injected as environment variables.</p>
+</li>
+<li>
+<p>Namespaces plus quotas are a lightweight multitenancy boundary (this session does not deep-dive RBAC).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_steps_to_apply"><a class="anchor" href="#_steps_to_apply"></a>Steps to Apply</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="strategies"><a class="anchor" href="#strategies"></a>1. Compare RollingUpdate and Recreate</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-clock"></i></span> ~30 seconds for Recreate (pods replaced); RollingUpdate with the same pod template returns almost immediately</p>
+</div>
+<div class="paragraph">
+<p><strong>What:</strong> Apply ConfigMap and Secret, switch the Deployment to Recreate, observe the rollout, then restore RollingUpdate.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> BizOps must know when a full cutover is acceptable versus when a rolling update is required for availability.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 03-deploy-config/configmap.yaml --context cluster
+oc apply -f 03-deploy-config/secret.yaml --context cluster
+oc apply -f 03-deploy-config/deployment-recreate.yaml --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.strategy.type}{"\n"}' --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 03-deploy-config/deployment-rolling.yaml --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.strategy.type}{"\n"}' --context cluster</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: Strategy is RollingUpdate again</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get deployment demo-app -n bizops-demo -o jsonpath='strategy={.spec.strategy.type}{"\n"}' --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">strategy=RollingUpdate</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="rollback"><a class="anchor" href="#rollback"></a>2. Roll back a bad image change</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-clock"></i></span> ~1 minute (about 60s waiting on the bad image, then undo completes in a few seconds)</p>
+</div>
+<div class="paragraph">
+<p><strong>What:</strong> Point the Deployment at a non-existent tag, observe the bad revision, then roll back.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Rollbacks are the fastest recovery when a new image never becomes Ready.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set image deployment/demo-app httpd=registry.access.redhat.com/ubi9/httpd-24:does-not-exist -n bizops-demo --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --timeout=60s --context cluster || true
+oc get pods -n bizops-demo -l app=demo-app --context cluster
+oc rollout undo deployment/demo-app -n bizops-demo --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: Pods are Ready again on a valid image</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n bizops-demo -l app=demo-app --context cluster
+oc get deployment demo-app -n bizops-demo -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}' --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                        READY   STATUS    RESTARTS   AGE
+demo-app-...                1/1     Running   0          30s
+demo-app-...                1/1     Running   0          30s
+registry.access.redhat.com/ubi9/httpd-24:latest</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="sensitive-config"><a class="anchor" href="#sensitive-config"></a>3. Review and manage sensitive configuration</h3>
+<div class="paragraph">
+<p><strong>What:</strong> Confirm Secret and ConfigMap exist and are referenced by the Deployment env vars.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Mis-mounted secrets and config are a common cause of start failures; BizOps must validate both objects and references.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get configmap demo-app-config -n bizops-demo -o yaml --context cluster
+oc get secret demo-app-secret -n bizops-demo -o jsonpath='{.type}{" keys="}{.data}{"\n"}' --context cluster
+oc set env deployment/demo-app --list -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Do not print Secret values in shared terminals or chat logs. Use key existence checks, not <code>oc get secret -o yaml</code> with decoded data in recordings.
+</td>
+</tr>
+</table>
+</div>
+<details>
+<summary class="title">Verify: Deployment lists APP_MESSAGE and APP_TOKEN from ConfigMap/Secret</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc set env deployment/demo-app --list -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># deployments/demo-app, container httpd
+APP_MESSAGE from configmap demo-app-config / key: message
+APP_TOKEN from secret demo-app-secret / key: token</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="multitenancy"><a class="anchor" href="#multitenancy"></a>4. Multitenancy settings (brief)</h3>
+<div class="paragraph">
+<p><strong>What:</strong> Create a second namespace with a ResourceQuota that caps pods, CPU, and memory.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Soft multitenancy on OpenShift often starts with namespaces and quotas so one team cannot consume the whole cluster. RBAC depth is out of scope for this hour.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 03-deploy-config/tenant-namespace.yaml --context cluster
+oc apply -f 03-deploy-config/resourcequota.yaml --context cluster
+oc get resourcequota -n bizops-tenant-a --context cluster
+oc describe resourcequota team-a-quota -n bizops-tenant-a --context cluster</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: Hard limits show pods=10 and CPU/memory caps</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get resourcequota team-a-quota -n bizops-tenant-a -o yaml --context cluster | sed -n '/hard:/,/used:/p'</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">  hard:
+    limits.cpu: "2"
+    limits.memory: 2Gi
+    pods: "10"
+    requests.cpu: "1"
+    requests.memory: 1Gi</code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_this_solves_compared_to_session_2"><a class="anchor" href="#_what_this_solves_compared_to_session_2"></a>What This Solves (Compared to Session 2)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Problem from Session 2</th>
+<th class="tableblock halign-left valign-top">How This Session Solves It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Only one deployment strategy exercised</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Recreate vs RollingUpdate comparison</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No recovery drill for a bad image</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oc rollout undo</code> after a failed image set</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No practice with Secrets / ConfigMaps</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Objects created and referenced on the Deployment</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No tenant boundary example</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Second namespace with ResourceQuota</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_this_does_not_solve_yet"><a class="anchor" href="#_what_this_does_not_solve_yet"></a>What This Does NOT Solve (Yet)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Remaining Problem</th>
+<th class="tableblock halign-left valign-top">Addressed In</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Systematic failure investigation and evidence collection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="04-troubleshoot-capacity.html" class="xref page">Session 4</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Measuring utilization and spotting capacity pressure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="04-troubleshoot-capacity.html" class="xref page">Session 4</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_official_documentation"><a class="anchor" href="#_official_documentation"></a>Official Documentation</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/applications/deployments/deployment-strategies.html">Deployment strategies</a></p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/applications/deployments/managing-deployment-processes.html#deployments-rolling-back_configuring-deployments">Rolling back a Deployment</a></p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/nodes/pods/nodes-pods-configuring.html">Configuring how pods run</a></p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/applications/quotas/quotas-setting-per-project.html">Resource quotas per project</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_alternatives_considered"><a class="anchor" href="#_alternatives_considered"></a>Alternatives Considered</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Approach</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deployment strategy + rollout undo</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Native, no extra operators, ideal for BizOps drills</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GitOps progressive delivery</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Strong for production change control; heavier than this lab needs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Full RBAC multitenancy design</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Important in real estates; intentionally shallow here</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reset"><a class="anchor" href="#_reset"></a>Reset</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Restore the rolling baseline Deployment, remove workshop config objects, and delete the tenant namespace. Order matters: remove dependent Deployment env refs by re-applying baseline before deleting Secret/ConfigMap; delete tenant namespace last (it cascades the quota).</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 00-baseline/deployment.yaml --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster
+oc delete -f 03-deploy-config/secret.yaml --ignore-not-found --context cluster
+oc delete -f 03-deploy-config/configmap.yaml --ignore-not-found --context cluster
+oc delete -f 03-deploy-config/resourcequota.yaml --ignore-not-found --context cluster
+oc delete -f 03-deploy-config/tenant-namespace.yaml --ignore-not-found --wait --context cluster</code></pre>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="02-day2-operations.html" class="query-params-link">Session 2: Day-2 Operations</a></span>
+  <span class="next"><a href="04-troubleshoot-capacity.html" class="query-params-link">Session 4: Troubleshoot and Capacity</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OpenShift BizOps Operations Workshop :: OpenShift BizOps Operations Workshop</title>
+    <link rel="canonical" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/04-troubleshoot-capacity.html">
+    <link rel="prev" href="03-deploy-config.html">
+    <meta name="generator" content="Antora 3.0.0">
+    <link rel="stylesheet" href="../_/css/site.css">
+<link rel="icon" href="../_/img/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://developers.redhat.com" target="_blank"><img
+          src="../_/img/RHDLogo.svg" height="40px" alt="Red Hat Developer Program"></a>
+      <a class="navbar-item" href="https://JWimsingues.github.io/openshift-bizops-antora-workshop">OpenShift BizOps Operations Workshop</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Books</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">CheatSheets</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">CheatSheet A</a>
+            <a class="navbar-item" href="#">CheatSheet B</a>
+            <a class="navbar-item" href="#">CheatSheet C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Upcoming Events</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Event A</a>
+            <a class="navbar-item" href="#">Event B</a>
+            <a class="navbar-item" href="#">Event C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">More Tutorials</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Tutorial A</a>
+            <a class="navbar-item" href="#">Tutorial B</a>
+            <a class="navbar-item" href="#">Tutorial C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="openshift-bizops-workshop" data-version="master">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html" class=" query-params-link">OpenShift BizOps Operations Workshop</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Overview</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="00-setup.html">Cluster Setup</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#prerequisites">Prerequisites</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#export-variables">Export Workshop Variables</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#login-cluster">Log In to the Cluster</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#clone-repo">Clone the Repository</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="00-setup.html#deploy-baseline">Deploy the Baseline App</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="01-architecture-access.html">Session 1: Architecture and Access</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-flow">Traffic Flow</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#external-access">External Access</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#deployment-status">Deployment Status</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#health">Health Checks</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="01-architecture-access.html#traffic-routing">Traffic Routing</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="02-day2-operations.html">Session 2: Day-2 Operations</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#inspect-image">Inspect Images</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#container-logs">Container Logs</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#scale">Scale Workloads</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="02-day2-operations.html#ha">High Availability</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="03-deploy-config.html">Session 3: Deploy and Config</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#strategies">Deployment Strategies</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#rollback">Rollback</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#sensitive-config">Sensitive Configuration</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="03-deploy-config.html#multitenancy">Multitenancy Basics</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="04-troubleshoot-capacity.html">Session 4: Troubleshoot and Capacity</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#investigate">Investigate Failures</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#collect-evidence">Collect Evidence</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#utilization">Resource Utilization</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="#capacity">Capacity Constraints</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">OpenShift BizOps Operations Workshop</span>
+    <span class="version">master</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <span class="title">OpenShift BizOps Operations Workshop</span>
+      <ul class="versions">
+        <li class="version is-current">
+          <a href="index.html">master</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">OpenShift BizOps Operations Workshop</a></li>
+    <li><a href="04-troubleshoot-capacity.html">Session 4: Troubleshoot and Capacity</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/JWimsingues/openshift-bizops-antora-workshop/edit/main/documentation/modules/ROOT/pages/04-troubleshoot-capacity.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">OpenShift BizOps Operations Workshop</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Deploy intentionally broken and resource-hungry workloads, practice a short investigation loop, collect evidence, and read node/pod utilization to spot capacity pressure. Builds on <a href="03-deploy-config.html" class="xref page">Session 3</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Completed <a href="03-deploy-config.html" class="xref page">Session 3</a> (or at least a healthy baseline <code>demo-app</code>)</p>
+</li>
+<li>
+<p>Metrics available via <code>oc adm top</code> (OpenShift monitoring stack on the cluster)</p>
+</li>
+<li>
+<p>Context <code>cluster</code> available</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If <code>oc adm top</code> returns an error about metrics, wait a few minutes for the monitoring stack on a fresh cluster, then retry.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_it_works"><a class="anchor" href="#_how_it_works"></a>How It Works</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A practical BizOps loop:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Reproduce or deploy the failing object.</p>
+</li>
+<li>
+<p>Read status, events, and logs.</p>
+</li>
+<li>
+<p>Capture evidence (commands and outputs) before changing anything.</p>
+</li>
+<li>
+<p>Fix the smallest thing that restores service.</p>
+</li>
+<li>
+<p>Check whether CPU/memory requests leave the cluster with enough headroom.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_steps_to_apply"><a class="anchor" href="#_steps_to_apply"></a>Steps to Apply</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="investigate"><a class="anchor" href="#investigate"></a>1. Investigate application failures</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-clock"></i></span> ~30 seconds (wait ~25s after apply for ImagePullBackOff / CrashLoopBackOff to show)</p>
+</div>
+<div class="paragraph">
+<p><strong>What:</strong> Apply a bad-image Deployment and a crash-loop Deployment, then diagnose each.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Image pull failures and crash loops are among the most common production tickets.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 04-troubleshoot/broken-deployment.yaml --context cluster
+oc apply -f 04-troubleshoot/crashloop-deployment.yaml --context cluster
+sleep 20
+oc get pods -n bizops-demo --context cluster
+oc describe deployment broken-app -n bizops-demo --context cluster | sed -n '/Events/,$p'
+oc describe pod -n bizops-demo -l app=crash-app --context cluster | sed -n '/Events/,$p'</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: You can name the failure modes (ImagePullBackOff and CrashLoopBackOff)</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n bizops-demo -l 'app in (broken-app,crash-app)' --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                          READY   STATUS             RESTARTS   AGE
+broken-app-...                0/1     ImagePullBackOff   0          30s
+crash-app-...                 0/1     CrashLoopBackOff   2          30s</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="collect-evidence"><a class="anchor" href="#collect-evidence"></a>2. Collect troubleshooting data and evidence</h3>
+<div class="paragraph">
+<p><strong>What:</strong> Capture pod YAML snippets, events, and logs into files you could attach to a ticket.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Evidence collected before a fix preserves the failure signature for post-incident review.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">mkdir -p /tmp/bizops-evidence
+oc get pods -n bizops-demo -o wide --context cluster &gt; /tmp/bizops-evidence/pods.txt
+oc get events -n bizops-demo --sort-by='.lastTimestamp' --context cluster &gt; /tmp/bizops-evidence/events.txt
+oc logs -n bizops-demo -l app=crash-app --tail=50 --context cluster &gt; /tmp/bizops-evidence/crash-logs.txt || true
+oc get deploy broken-app crash-app -n bizops-demo -o yaml --context cluster &gt; /tmp/bizops-evidence/deployments.yaml
+ls -l /tmp/bizops-evidence</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+For cluster-wide platform issues (not this lab), <code>oc adm must-gather</code> collects a support bundle. Prefer scoped evidence first for application failures.
+</td>
+</tr>
+</table>
+</div>
+<details>
+<summary class="title">Verify: Evidence directory contains pods, events, and deployment YAML</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">ls /tmp/bizops-evidence</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">crash-logs.txt
+deployments.yaml
+events.txt
+pods.txt</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="utilization"><a class="anchor" href="#utilization"></a>3. Monitor workload health and resource utilization</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-clock"></i></span> ~30 seconds (hungry pod Ready quickly; wait ~15-30s more if metrics are empty)</p>
+</div>
+<div class="paragraph">
+<p><strong>What:</strong> Deploy a CPU-busy workload with elevated requests and inspect <code>oc adm top</code> for pods and nodes.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Utilization shows whether the app is hot and whether nodes still have schedulable capacity.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc apply -f 04-troubleshoot/hungry-deployment.yaml --context cluster
+oc rollout status deployment/hungry-app -n bizops-demo --context cluster
+sleep 20
+oc adm top pods -n bizops-demo --context cluster
+oc adm top nodes --context cluster</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: <code>hungry-app</code> appears in pod metrics; node metrics show CPU/memory columns</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc adm top pods -n bizops-demo --context cluster | grep -E 'NAME|hungry|demo-app' || true</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                         CPU(cores)   MEMORY(bytes)
+demo-app-...                 2m           40Mi
+hungry-app-...               450m         20Mi</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="capacity"><a class="anchor" href="#capacity"></a>4. Identify potential capacity constraints</h3>
+<div class="paragraph">
+<p><strong>What:</strong> Compare pod requests to node allocatable resources and note what would block further scale-out.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Capacity problems often show up as Pending pods with failed scheduling, not only as high CPU on a running pod.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc describe nodes --context cluster | sed -n '/Allocated resources/,+12p'
+oc get pods -n bizops-demo -o 'custom-columns=NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory' --context cluster</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+On a small workshop cluster, the hungry workload&#8217;s <code>500m</code> request may already be a meaningful fraction of a worker. Treat Pending pods with <code>Insufficient cpu</code> / <code>Insufficient memory</code> events as capacity signals.
+</td>
+</tr>
+</table>
+</div>
+<details>
+<summary class="title">Verify: You can list request totals per pod and relate them to node Allocated resources</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n bizops-demo --field-selector=status.phase=Pending --context cluster || true
+oc get events -n bizops-demo --field-selector reason=FailedScheduling --context cluster | tail -n 5 || true</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">No resources found in bizops-demo namespace.
+(or FailedScheduling events if the cluster is tight on CPU/memory)</code></pre>
+</div>
+</div>
+</div>
+</details>
+<hr>
+</div>
+<div class="sect2">
+<h3 id="_5_restore_a_healthy_demo_namespace"><a class="anchor" href="#_5_restore_a_healthy_demo_namespace"></a>5. Restore a healthy demo namespace</h3>
+<div class="paragraph">
+<p><span class="icon"><i class="fa fa-clock"></i></span> ~30 seconds</p>
+</div>
+<div class="paragraph">
+<p><strong>What:</strong> Delete the broken/hungry lab Deployments and confirm <code>demo-app</code> remains healthy.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why:</strong> Leave the cluster clean for the next participant or a re-run of earlier sessions.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc delete -f 04-troubleshoot/ --ignore-not-found --context cluster
+oc get pods -n bizops-demo --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+<details>
+<summary class="title">Verify: Only demo-app pods remain and are Ready</summary>
+<div class="content">
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc get pods -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+<div class="listingblock console-output">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">NAME                        READY   STATUS    RESTARTS   AGE
+demo-app-...                1/1     Running   0          5m
+demo-app-...                1/1     Running   0          5m</code></pre>
+</div>
+</div>
+</div>
+</details>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_this_solves_compared_to_session_3"><a class="anchor" href="#_what_this_solves_compared_to_session_3"></a>What This Solves (Compared to Session 3)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Problem from Session 3</th>
+<th class="tableblock halign-left valign-top">How This Session Solves It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No structured failure drill</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ImagePullBackOff and CrashLoopBackOff investigation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No evidence bundle habit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Files under <code>/tmp/bizops-evidence</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No capacity lens</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oc adm top</code> plus request vs allocatable review</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_this_does_not_solve_yet"><a class="anchor" href="#_what_this_does_not_solve_yet"></a>What This Does NOT Solve (Yet)</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 60%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Remaining Problem</th>
+<th class="tableblock halign-left valign-top">Addressed In</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Deep Prometheus/Grafana dashboards</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Out of scope for these four core sessions (advanced topic)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Multi-container pod patterns and advanced networking</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Out of scope for these four core sessions (advanced topic)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_official_documentation"><a class="anchor" href="#_official_documentation"></a>Official Documentation</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/support/troubleshooting/investigating-pod-issues.html">Investigating pod issues</a></p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/support/gathering-cluster-data.html">Gathering data about your cluster</a></p>
+</li>
+<li>
+<p><a href="https://docs.openshift.com/container-platform/latest/nodes/clusters/nodes-cluster-resource-levels.html">Estimating resource levels</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_alternatives_considered"><a class="anchor" href="#_alternatives_considered"></a>Alternatives Considered</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Approach</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>oc describe</code> / events / logs / <code>oc adm top</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fast, no extra tools, works on empty OCP with monitoring</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Full <code>oc adm must-gather</code> for every app ticket</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Excellent for platform bugs; heavier than needed for app ImagePullBackOff</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External APM only</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Useful complement; not a substitute for cluster-native evidence</p></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reset"><a class="anchor" href="#_reset"></a>Reset</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Deletes lab Deployments in reverse of creation intent and leaves the baseline demo app in place. Namespace deletion is left to <a href="00-setup.html#reset" class="xref page">Setup Reset</a> if you want a full teardown.</p>
+</div>
+<div class="listingblock console-input">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash">oc delete -f 04-troubleshoot/hungry-deployment.yaml --ignore-not-found --context cluster
+oc delete -f 04-troubleshoot/crashloop-deployment.yaml --ignore-not-found --context cluster
+oc delete -f 04-troubleshoot/broken-deployment.yaml --ignore-not-found --context cluster
+oc apply -f 00-baseline/ --context cluster
+oc rollout status deployment/demo-app -n bizops-demo --context cluster</code></pre>
+</div>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="03-deploy-config.html" class="query-params-link">Session 3: Deploy and Config</a></span>
+</nav>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <a class="rhd-logo" href="https://developers.redhat.com" target="_blank"></div>
+</footer>
+<script src="../_/js/vendor/clipboard.js"></script>
+<script src="../_/js/site.js"></script>
+<script async src="../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

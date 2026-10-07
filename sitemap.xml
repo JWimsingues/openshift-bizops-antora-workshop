@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/00-setup.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/01-architecture-access.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/02-day2-operations.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/03-deploy-config.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/04-troubleshoot-capacity.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+<url>
+<loc>https://JWimsingues.github.io/openshift-bizops-antora-workshop/openshift-bizops-workshop/index.html</loc>
+<lastmod>2026-10-07T11:33:55.260Z</lastmod>
+</url>
+</urlset>
