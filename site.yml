@@ -3,7 +3,7 @@ runtime:
 
 site:
   title: OpenShift BizOps Operations Workshop
-  url: https://example.github.io/openshift-bizops-workshop
+  url: https://JWimsingues.github.io/openshift-bizops-workshop
   start_page: openshift-bizops-workshop::index.adoc
 
 content:

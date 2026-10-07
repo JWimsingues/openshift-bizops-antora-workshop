@@ -4,9 +4,8 @@ Four one-hour progressive sessions that teach OpenShift day-2 BizOps skills on a
 
 == View the Course
 
-The full course is published at: https://example.github.io/openshift-bizops-workshop
+The full course is published at: https://JWimsingues.github.io/openshift-bizops-workshop
 
-NOTE: Replace `example` with your GitHub org or user before publishing.
 
 == Local Development
 
