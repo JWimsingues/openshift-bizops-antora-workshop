@@ -62,7 +62,7 @@ oc config rename-context "$(oc config current-context)" cluster
 EOF
 ----
 
-Replace `<cluster-domain>`, the `example` GitHub org/user in `GIT_REPO_URL`, and `<username>` / `<password>` (or use `--token`). Match the API port to your environment (`443` for many ROSA clusters, `6443` for many self-managed clusters).
+Replace `<cluster-domain>`, and `<username>` / `<password>` (or use `--token`). Match the API port to your environment (`443` for many ROSA clusters, `6443` for many self-managed clusters).
 
 [cols="2,2,4",options="header"]
 |===
