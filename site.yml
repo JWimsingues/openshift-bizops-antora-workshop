@@ -3,8 +3,8 @@ runtime:
 
 site:
   title: OpenShift BizOps Operations Workshop
-  url: https://JWimsingues.github.io/openshift-bizops-workshop
-  start_page: openshift-bizops-workshop::index.adoc
+  url: https://JWimsingues.github.io/openshift-bizops-antora-workshop
+  start_page: openshift-bizops-antora-workshop::index.adoc
 
 content:
   sources:

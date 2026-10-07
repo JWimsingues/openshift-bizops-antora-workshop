@@ -48,7 +48,7 @@ cat > myenv.sh <<'EOF'
 # ── Workshop variables ───────────────────────────────────────────────────
 # Self-managed OCP often uses :6443. ROSA / managed OpenShift often uses :443.
 export OCP_API_URL="https://api.<cluster-domain>:443"
-export GIT_REPO_URL="https://github.com/JWimsingues/openshift-bizops-workshop.git"
+export GIT_REPO_URL="https://github.com/JWimsingues/openshift-bizops-antora-workshop.git"
 export DEMO_NAMESPACE="bizops-demo"
 
 # ── Context cleanup (idempotent) ─────────────────────────────────────────
@@ -129,7 +129,7 @@ NOTE: On managed OpenShift you may authenticate as a user with `cluster-admin` r
 [source,bash,subs="+macros,+attributes"]
 ----
 git clone "$GIT_REPO_URL"
-cd openshift-bizops-workshop
+cd openshift-bizops-antora-workshop
 ----
 
 TIP: If you already cloned the repo and created `myenv.sh` inside it, skip the clone and keep working from that directory.

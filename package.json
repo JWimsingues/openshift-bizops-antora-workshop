@@ -1,7 +1,7 @@
 {
-  "name": "openshift-bizops-workshop",
+  "name": "openshift-bizops-antora-workshop",
   "description": "OpenShift BizOps Operations Workshop - Course Documentation Site",
-  "homepage": "https://JWimsingues.github.io/openshift-bizops-workshop",
+  "homepage": "https://JWimsingues.github.io/openshift-bizops-antora-workshop",
   "dependencies": {
     "@antora/cli": "^2.3.1",
     "@antora/site-generator-default": "^2.3.1",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JWimsingues/openshift-bizops-workshop.git"
+    "url": "git+https://github.com/JWimsingues/openshift-bizops-antora-workshop.git"
   },
   "license": "Apache-2.0",
   "engines": {
