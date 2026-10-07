@@ -26,7 +26,7 @@ A practical BizOps loop:
 [#investigate]
 === 1. Investigate application failures
 
-icon:clock[] ~1 minute (ImagePullBackOff and CrashLoopBackOff appear quickly)
+icon:clock[] ~30 seconds (wait ~25s after apply for ImagePullBackOff / CrashLoopBackOff to show)
 
 *What:* Apply a bad-image Deployment and a crash-loop Deployment, then diagnose each.
 
@@ -77,7 +77,7 @@ mkdir -p /tmp/bizops-evidence
 oc get pods -n bizops-demo -o wide --context {cluster-context} > /tmp/bizops-evidence/pods.txt
 oc get events -n bizops-demo --sort-by='.lastTimestamp' --context {cluster-context} > /tmp/bizops-evidence/events.txt
 oc logs -n bizops-demo -l app=crash-app --tail=50 --context {cluster-context} > /tmp/bizops-evidence/crash-logs.txt || true
-oc get deployment broken-app,crash-app -n bizops-demo -o yaml --context {cluster-context} > /tmp/bizops-evidence/deployments.yaml
+oc get deploy broken-app crash-app -n bizops-demo -o yaml --context {cluster-context} > /tmp/bizops-evidence/deployments.yaml
 ls -l /tmp/bizops-evidence
 ----
 
@@ -107,7 +107,7 @@ pods.txt
 [#utilization]
 === 3. Monitor workload health and resource utilization
 
-icon:clock[] ~30 seconds (hungry workload starts; metrics update shortly after)
+icon:clock[] ~30 seconds (hungry pod Ready quickly; wait ~15-30s more if metrics are empty)
 
 *What:* Deploy a CPU-busy workload with elevated requests and inspect `oc adm top` for pods and nodes.
 
@@ -118,6 +118,7 @@ icon:clock[] ~30 seconds (hungry workload starts; metrics update shortly after)
 ----
 oc apply -f 04-troubleshoot/hungry-deployment.yaml --context {cluster-context}
 oc rollout status deployment/hungry-app -n bizops-demo --context {cluster-context}
+sleep 20
 oc adm top pods -n bizops-demo --context {cluster-context}
 oc adm top nodes --context {cluster-context}
 ----
@@ -153,7 +154,7 @@ hungry-app-...               450m         20Mi
 [source,bash,subs="+macros,+attributes"]
 ----
 oc describe nodes --context {cluster-context} | sed -n '/Allocated resources/,+12p'
-oc get pods -n bizops-demo -o custom-columns=NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory --context {cluster-context}
+oc get pods -n bizops-demo -o 'custom-columns=NAME:.metadata.name,CPU_REQ:.spec.containers[*].resources.requests.cpu,MEM_REQ:.spec.containers[*].resources.requests.memory' --context {cluster-context}
 ----
 
 IMPORTANT: On a small workshop cluster, the hungry workload's `500m` request may already be a meaningful fraction of a worker. Treat Pending pods with `Insufficient cpu` / `Insufficient memory` events as capacity signals.

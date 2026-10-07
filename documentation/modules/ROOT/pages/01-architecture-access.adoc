@@ -34,16 +34,17 @@ Understanding that chain is the foundation for every later operations task.
 [source,bash,subs="+macros,+attributes"]
 ----
 oc get pods,svc,route -n bizops-demo -o wide --context {cluster-context}
-oc get endpoints demo-app -n bizops-demo --context {cluster-context}
+oc get endpointslice -n bizops-demo -l kubernetes.io/service-name=demo-app --context {cluster-context}
 ----
 
-.Verify: Endpoints list Ready pod IPs on port 8080
+.Verify: EndpointSlice lists Ready pod IPs on port 8080
 [%collapsible]
 ====
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
 oc describe svc demo-app -n bizops-demo --context {cluster-context} | sed -n '1,25p'
+oc get endpointslice -n bizops-demo -l kubernetes.io/service-name=demo-app -o wide --context {cluster-context}
 ----
 
 [.console-output]
@@ -55,9 +56,13 @@ Selector:          app=demo-app
 Type:              ClusterIP
 IP:                172.30.x.x
 Port:              http  8080/TCP
-Endpoints:         10.128.x.x:8080,10.129.x.x:8080
+
+NAME             ADDRESSTYPE   PORTS   ENDPOINTS                   AGE
+demo-app-xxxxx   IPv4          8080    10.128.x.x,10.129.x.x       5m
 ----
 ====
+
+NOTE: On OpenShift 4.19+ / Kubernetes 1.33+, prefer `EndpointSlice` over the legacy `Endpoints` API.
 
 '''
 

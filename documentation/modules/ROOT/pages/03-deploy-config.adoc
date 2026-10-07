@@ -21,7 +21,7 @@ Change how the demo app rolls out, practice an image rollback, wire ConfigMap an
 [#strategies]
 === 1. Compare RollingUpdate and Recreate
 
-icon:clock[] ~1 minute per strategy change (rollout completion)
+icon:clock[] ~30 seconds for Recreate (pods replaced); RollingUpdate with the same pod template returns almost immediately
 
 *What:* Apply ConfigMap and Secret, switch the Deployment to Recreate, observe the rollout, then restore RollingUpdate.
 
@@ -66,7 +66,7 @@ strategy=RollingUpdate
 [#rollback]
 === 2. Roll back a bad image change
 
-icon:clock[] ~1-2 minutes (failed pull attempt, then undo and Ready)
+icon:clock[] ~1 minute (about 60s waiting on the bad image, then undo completes in a few seconds)
 
 *What:* Point the Deployment at a non-existent tag, observe the bad revision, then roll back.
 

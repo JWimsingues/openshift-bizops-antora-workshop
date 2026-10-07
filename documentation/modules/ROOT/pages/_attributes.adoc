@@ -2,7 +2,7 @@
 :source-highlighter: highlightjs
 :title: OpenShift BizOps Operations Workshop
 :cluster-context: cluster
-:ocp-version: 4.14+
+:ocp-version: 4.16+
 :demo-namespace: bizops-demo
 :demo-app: demo-app
 :httpd-image: registry.access.redhat.com/ubi9/httpd-24:latest

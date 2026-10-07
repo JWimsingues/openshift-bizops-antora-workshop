@@ -86,7 +86,7 @@ oc logs "$POD" -n bizops-demo --tail=5 --context {cluster-context}
 [#scale]
 === 3. Scale the workload
 
-icon:clock[] ~30 seconds (new pods become Ready)
+icon:clock[] ~15 seconds (scale to 3 Ready, then back to 2)
 
 *What:* Scale `demo-app` up to 3 replicas, then back to 2.
 

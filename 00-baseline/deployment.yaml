@@ -40,6 +40,9 @@ spec:
             limits:
               cpu: 200m
               memory: 256Mi
+          volumeMounts:
+            - name: www
+              mountPath: /var/www/html
           readinessProbe:
             httpGet:
               path: /
@@ -52,3 +55,7 @@ spec:
               port: http
             initialDelaySeconds: 15
             periodSeconds: 20
+      volumes:
+        - name: www
+          configMap:
+            name: demo-app-html

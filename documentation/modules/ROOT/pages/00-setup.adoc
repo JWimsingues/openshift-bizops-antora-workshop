@@ -6,11 +6,13 @@ Prepare a single empty OpenShift cluster with cluster-admin access, create your 
 == Prerequisites
 
 [#prerequisites]
-* OpenShift Container Platform {ocp-version} (empty cluster is fine)
+* OpenShift Container Platform {ocp-version} (self-managed or managed such as ROSA; empty app namespaces are fine)
 * `oc` CLI matching your cluster version
 * `git`, `curl`, and `envsubst` (from gettext)
 * Cluster-admin credentials (username/password or token) provided by your instructor
 * Network access from your workstation to the cluster API and application router
+
+NOTE: On ROSA and other managed OpenShift services the API URL often uses port `443` (not `6443`), and `oc get nodes` may show worker nodes only. Use the API and console URLs your instructor provides.
 
 == Cluster Mapping
 
@@ -44,7 +46,8 @@ cat > myenv.sh <<'EOF'
 # Console: https://console-openshift-console.apps.<cluster-domain>
 
 # ── Workshop variables ───────────────────────────────────────────────────
-export OCP_API_URL="https://api.<cluster-domain>:6443"
+# Self-managed OCP often uses :6443. ROSA / managed OpenShift often uses :443.
+export OCP_API_URL="https://api.<cluster-domain>:443"
 export GIT_REPO_URL="https://github.com/example/openshift-bizops-workshop.git"
 export DEMO_NAMESPACE="bizops-demo"
 
@@ -59,7 +62,7 @@ oc config rename-context "$(oc config current-context)" cluster
 EOF
 ----
 
-Replace `<cluster-domain>`, the `example` GitHub org/user in `GIT_REPO_URL`, and `<username>` / `<password>` (or use `--token`).
+Replace `<cluster-domain>`, the `example` GitHub org/user in `GIT_REPO_URL`, and `<username>` / `<password>` (or use `--token`). Match the API port to your environment (`443` for many ROSA clusters, `6443` for many self-managed clusters).
 
 [cols="2,2,4",options="header"]
 |===
@@ -155,11 +158,13 @@ service.yaml
 [#deploy-baseline]
 === 4. Deploy the baseline demo application
 
-icon:clock[] ~1 minute (resources accepted quickly; pods ready in ~30-60s)
+icon:clock[] ~1 minute (image pull ~5-10s when cold; pods Ready in ~30-45s when the image is cached)
 
-*What:* Apply the namespace, Deployment, Service, and Route under `00-baseline/`.
+*What:* Apply the namespace, HTML ConfigMap, Deployment, Service, and Route under `00-baseline/`.
 
 *Why:* Later sessions inspect and operate on this same application instead of starting from an empty namespace each time.
+
+NOTE: Files in `00-baseline/` are ordered so the namespace and ConfigMap are created before the Deployment.
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
