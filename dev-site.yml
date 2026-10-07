@@ -11,16 +11,19 @@ content:
     - url: .
       branches: [HEAD, main, master]
       start_path: documentation
+
 asciidoc:
   attributes:
     title: OpenShift BizOps Operations Workshop (Dev Mode)
   extensions:
     - ./lib/remote-include-processor.js
     - ./lib/tab-block.js
+
 ui:
   bundle:
-    url: https://github.com/redhat-developer-demos/rhd-tutorial-ui/releases/download/v0.1.10/ui-bundle.zip
+    url: https://github.com/redhat-scholars/course-ui/releases/download/v0.1.14/ui-bundle.zip
     snapshot: true
   supplemental_files: ./supplemental-ui
+
 output:
   dir: ./gh-pages
